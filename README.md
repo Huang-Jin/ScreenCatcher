@@ -10,6 +10,7 @@ This program could catch informations from the screen, which includes the RGB va
 Besides, it could make a screenshot of your screen. By using the shortcut Ctrl+Alt+Q to activates this function. If you have used the screenshot tool provided by QQ, you will find that they are very similar. As there are no powerful programs which could make a screenshot in the Linux system, this program will have a good performance.
 
 Version 1.1
+
 Fixed some bugs and tested the performance in Ubuntu14.
 
 I found that the icon and the function of saving screenshot into file can't work in this Linux System. So I replaced them with OS_Prefered codes.

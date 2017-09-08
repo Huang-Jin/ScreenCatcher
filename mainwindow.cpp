@@ -216,6 +216,7 @@ void MainWindow::ActivateRGBCatcher()
 void MainWindow::ActivateScreenShot()
 {
     this->hide();
+    update();
     m_screenShotForm->setShotting(true);
     m_screenShotForm->beginShotting();
     m_screenShotForm->show();

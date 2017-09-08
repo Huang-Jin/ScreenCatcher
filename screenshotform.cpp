@@ -11,8 +11,6 @@
 #include <QFileDialog>
 #include <QCursor>
 
-#include <windows.h>
-
 ScreenShotForm::ScreenShotForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ScreenShotForm)
@@ -200,6 +198,7 @@ void ScreenShotForm::mousePressEvent(QMouseEvent *event)
             int tol = 5;
 
             QPoint pt = cursor().pos();
+            pt = pt - this->geometry().topLeft();
 
             // TopLeft
             if(abs(pt.x() - m_rect.left()) <= tol
@@ -421,6 +420,7 @@ void ScreenShotForm::mouseMoveEvent(QMouseEvent *event)
     {
         int tol = 5;
         QPoint pt = cursor().pos();
+        pt = pt - this->geometry().topLeft();
 
         // TopLeft
         if(abs(pt.x() - m_rect.left()) <= tol
@@ -528,6 +528,7 @@ void ScreenShotForm::showScaledPoint()
     int scale = 3;
     int space = 35;
     QPoint pt = cursor().pos();
+    pt = pt - this->geometry().topLeft();
     QImage image = screenImage.copy(pt.x()-size/(scale*2),pt.y()-size/(scale*2),
                                     size/scale,size/scale);
     image = image.scaled(size,size);
@@ -634,8 +635,15 @@ void ScreenShotForm::showSizeLabel(int x, int y)
 void ScreenShotForm::saveIntofile()
 {
     QImage image = screenImage.copy(m_rect);
+    QString fileName = QString("screenshot.png");
+#ifdef Q_OS_WIN
+    fileName = QFileDialog::getSaveFileName(this, tr("Save file"), "./screenshot.png",  tr("Allfiles(*.*);;Png(*.png);;"));
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("save file"), "screenshot.png",  tr("Allfile(*.*);;png(*.png)"));
+    if(fileName.isEmpty())
+    {
+        return;
+    }
+#endif
 
     image.save(fileName);
     hide();

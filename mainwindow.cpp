@@ -38,6 +38,10 @@ MainWindow::MainWindow(QWidget *parent) :
     setMaximumSize(winwidth,winheight);
     setMinimumSize(winwidth,winheight);
 
+//    QRect rect = ui->label_titleName->geometry();
+//    rect.setLeft(30);
+//    ui->label_titleName->setGeometry(rect);
+
     ui->statusBar->showMessage("Nothing now...");
 
     ui->centralWidget->setMouseTracking(true);
@@ -156,6 +160,10 @@ void MainWindow::DrawTemplateText()
     }
     else {
         color.setRgb(r,g,b);
+        QRgb rgb = qRgb(r,g,b);
+        QString name;
+        name =  QString("%1").arg(rgb,4,16,QLatin1Char('0'));
+        ui->label_test->setText("#" + name.mid(2));
         ui->statusBar->showMessage("Color is Changing, press Ctrl+P to pause...");
     }
 
@@ -188,9 +196,6 @@ void MainWindow::MouseMove()
     ui->text_r->setText(QString::number(qRed(rgb)));
     ui->text_g->setText(QString::number(qGreen(rgb)));
     ui->text_b->setText(QString::number(qBlue(rgb)));
-    QString name;
-    name =  QString("%1").arg(rgb,4,16,QLatin1Char('0'));
-    ui->label_test->setText("#" + name.mid(2));
 
     int crosssize = 3;
     int scale = 3;

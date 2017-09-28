@@ -1,9 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>images/bg_main.jpg</file>
-        <file>images/bg_title.tif</file>
         <file>images/fontawesome-webfont.ttf</file>
         <file>images/wblue.ico</file>
-        <file>images/arrow.tif</file>
+        <file>images/arrow.cur</file>
     </qresource>
 </RCC>

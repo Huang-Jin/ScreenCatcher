@@ -11,6 +11,7 @@
 #include <QTimer>
 #include <QPainter>
 #include <QClipboard>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -22,12 +23,12 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowFlags(Qt::Tool|Qt::CustomizeWindowHint|Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
     setAttribute(Qt::WA_QuitOnClose,true);
 
-    setWindowOpacity(0.8);
+    setWindowOpacity(0.9);
 
-    ui->horizontalLayoutWidget->setStyleSheet("#horizontalLayoutWidget{border-image:url(:/images/bg_title.tif)}");
+    ui->horizontalLayoutWidget->setStyleSheet("#horizontalLayoutWidget{background-color:#dfdfdf}");
     ui->horizontalLayoutWidget_2->setStyleSheet("#horizontalLayoutWidget_2{border-image:url(:/images/bg_main.jpg)}");
-    ui->btn_closeWindow->setStyleSheet("background-color:rgba(255,255,0,128);");
-    ui->statusBar->setStyleSheet("background-color:#AAAAFF");
+    ui->btn_closeWindow->setStyleSheet("background-color:#AFAFAF;");
+    ui->statusBar->setStyleSheet("background-color:#dfdfdf");
 
     IconHelper::Instance()->SetIcon(ui->btn_closeWindow, QChar(0xf00d), 10);
     connect(ui->btn_closeWindow,SIGNAL(clicked(bool)),this,SLOT(close()));
@@ -164,7 +165,7 @@ void MainWindow::DrawTemplateText()
         QString name;
         name =  QString("%1").arg(rgb,4,16,QLatin1Char('0'));
         ui->label_test->setText("#" + name.mid(2));
-        ui->statusBar->showMessage("Color is Changing, press Ctrl+P to pause...");
+        ui->statusBar->showMessage("Color is Changing, Ctrl+P to pause...");
     }
 
 //    qDebug() << color.colorNames().at(0);
@@ -213,9 +214,9 @@ void MainWindow::ActivateRGBCatcher()
 {
     bRgbCatching = !bRgbCatching;
     if(!bRgbCatching)
-        ui->statusBar->showMessage("RGB Catcher paused, press Ctrl+P to continue...");
+        ui->statusBar->showMessage("Paused, Ctrl+P to continue...");
     else
-        ui->statusBar->showMessage("RGB Catcher continued, press Ctrl+P to pause...");
+        ui->statusBar->showMessage("Continued, Ctrl+P to pause...");
 }
 
 void MainWindow::ActivateScreenShot()
@@ -236,6 +237,7 @@ void MainWindow::copyRGBData()
                  .arg(ui->label_test->text());
 
     board->setText(text);
+    ui->statusBar->showMessage("Message copy is completed.");
 }
 
 void MainWindow::exitProcess()

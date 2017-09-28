@@ -22,7 +22,7 @@ ScreenShotForm::ScreenShotForm(QWidget *parent) :
     setMinimumSize(screen->size());
     setMouseTracking(true);
 
-    m_arrowCursor = QCursor(QPixmap(":/images/arrow.tif"),0,0);
+    m_arrowCursor = QCursor(QPixmap(":/images/arrow.cur"),0,0);
     this->setCursor(m_arrowCursor);
 
     QRect rect = ui->horizontalLayoutWidget->geometry();

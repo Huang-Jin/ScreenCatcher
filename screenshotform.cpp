@@ -162,6 +162,8 @@ void ScreenShotForm::paintEvent(QPaintEvent *event)
         showPopMenu(m_rect.right(),m_rect.bottom());
         showScaleCorner(m_rect,&painter);
     }
+
+    painter.end();
 }
 
 void ScreenShotForm::hideEvent(QHideEvent *event)

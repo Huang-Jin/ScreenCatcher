@@ -10,6 +10,7 @@
 #include <QClipboard>
 #include <QFileDialog>
 #include <QCursor>
+#include <QMessageBox>
 
 ScreenShotForm::ScreenShotForm(QWidget *parent) :
     QWidget(parent),
@@ -22,7 +23,7 @@ ScreenShotForm::ScreenShotForm(QWidget *parent) :
     setMinimumSize(screen->size());
     setMouseTracking(true);
 
-    m_arrowCursor = QCursor(QPixmap(":/images/arrow.cur"),0,0);
+    m_arrowCursor = QCursor(QPixmap(":/images/arrow.cur"),5,2);
     this->setCursor(m_arrowCursor);
 
     QRect rect = ui->horizontalLayoutWidget->geometry();
@@ -47,8 +48,6 @@ ScreenShotForm::ScreenShotForm(QWidget *parent) :
     m_scaledscreenDefautRect.setLeft(-rect.width());
     m_scaledscreenDefautRect.setTop(-rect.height());
 
-    ui->screenscaled->setGeometry(m_scaledscreenDefautRect);
-
     ui->horizontalLayoutWidget->setStyleSheet("background-color:#969696;");
 
     connect(ui->btn_closeRect,SIGNAL(clicked(bool)),this,SLOT(hide()));
@@ -60,8 +59,11 @@ ScreenShotForm::ScreenShotForm(QWidget *parent) :
     m_bPopMenu = false;
     m_bMoving = false;
     m_bScaling = false;
-}
 
+    m_scalePt.setX(-1);
+    m_scalePt.setY(-1);
+    ui->screenscaled->setGeometry(m_scaledscreenDefautRect);
+}
 
 ScreenShotForm::~ScreenShotForm()
 {
@@ -130,11 +132,6 @@ void ScreenShotForm::paintEvent(QPaintEvent *event)
         painter.setPen(QPen(QColor(255,0,0),1,Qt::DotLine));
         painter.drawRect(rect);
 
-        if(!m_bPopMenu)
-        {
-            showScaledPoint();
-        }
-
         showSizeLabel(m_rect.left(),m_rect.top());
     }
 
@@ -163,6 +160,11 @@ void ScreenShotForm::paintEvent(QPaintEvent *event)
         showScaleCorner(m_rect,&painter);
     }
 
+    if(m_scalePt.x() != -1)
+    {
+        showScaledPoint(m_scalePt);
+    }
+
     painter.end();
 }
 
@@ -174,10 +176,12 @@ void ScreenShotForm::hideEvent(QHideEvent *event)
     m_bMoving = false;
     m_bScaling = false;
 
-    ui->horizontalLayoutWidget->setGeometry(m_popMenuDefautRect);
-    ui->label_size->setGeometry(m_labelDefautRect);
+    m_scalePt.setX(-1);
+    m_scalePt.setY(-1);
     ui->screenscaled->setGeometry(m_scaledscreenDefautRect);
 
+    ui->horizontalLayoutWidget->setGeometry(m_popMenuDefautRect);
+    ui->label_size->setGeometry(m_labelDefautRect);
     setCursor(m_arrowCursor);
     m_parent->show();
 }
@@ -195,96 +199,97 @@ void ScreenShotForm::mousePressEvent(QMouseEvent *event)
     {
         if(!m_bScreenShot)
             return;
+
+        m_bPt = event->pos();
+
         if(m_bPopMenu)
         {
-            int tol = 5;
-
             QPoint pt = cursor().pos();
             pt = pt - this->geometry().topLeft();
 
             // TopLeft
-            if(abs(pt.x() - m_rect.left()) <= tol
-                    && abs(pt.y() - m_rect.top()) <= tol)
+            if(abs(pt.x() - m_rect.left()) <= m_tolerance
+                    && abs(pt.y() - m_rect.top()) <= m_tolerance)
             {
                 setCursor(Qt::SizeFDiagCursor);
-                m_bPt = event->pos();
                 m_oldPt = m_rect.topLeft();
                 m_curCornerType = LEFTTOP;
                 m_bScaling = true;
+                m_scalePt = m_bPt;
             }
             // Top
-            else if(abs(pt.x() - m_rect.center().x()) <= tol
-                    && abs(pt.y() - m_rect.top()) <= tol)
+            else if(abs(pt.x() - m_rect.center().x()) <= m_tolerance
+                    && abs(pt.y() - m_rect.top()) <= m_tolerance)
             {
                 setCursor(Qt::SizeVerCursor);
-                m_bPt = event->pos();
                 m_oldPt = m_rect.topLeft();
                 m_oldPt2 = m_rect.topRight();
                 m_curCornerType = TOP;
                 m_bScaling = true;
+                m_scalePt = m_bPt;
             }
             // TopRight
-            else if(abs(pt.x() - m_rect.right()) <= tol
-                    && abs(pt.y() - m_rect.top()) <= tol)
+            else if(abs(pt.x() - m_rect.right()) <= m_tolerance
+                    && abs(pt.y() - m_rect.top()) <= m_tolerance)
             {
                 setCursor(Qt::SizeBDiagCursor);
-                m_bPt = event->pos();
                 m_oldPt = m_rect.topRight();
                 m_curCornerType = RIGHTTOP;
                 m_bScaling = true;
+                m_scalePt = m_bPt;
             }
             // Right
-            else if(abs(pt.x() - m_rect.right()) <= tol
-                    && abs(pt.y() - m_rect.center().y()) <= tol)
+            else if(abs(pt.x() - m_rect.right()) <= m_tolerance
+                    && abs(pt.y() - m_rect.center().y()) <= m_tolerance)
             {
                 setCursor(Qt::SizeHorCursor);
-                m_bPt = event->pos();
                 m_oldPt = m_rect.topRight();
                 m_oldPt2 = m_rect.bottomRight();
                 m_curCornerType = RIGHT;
                 m_bScaling = true;
+                m_scalePt = m_bPt;
             }
             // RightBottom
-            else if(abs(pt.x() - m_rect.right()) <= tol
-                    && abs(pt.y() - m_rect.bottom()) <= tol)
+            else if(abs(pt.x() - m_rect.right()) <= m_tolerance
+                    && abs(pt.y() - m_rect.bottom()) <= m_tolerance)
             {
                 setCursor(Qt::SizeFDiagCursor);
-                m_bPt = event->pos();
                 m_oldPt = m_rect.bottomRight();
                 m_curCornerType = RIGHTBOTTOM;
                 m_bScaling = true;
+                m_scalePt = m_bPt;
             }
             // Bottom
-            else if(abs(pt.x() - m_rect.center().x()) <= tol
-                    && abs(pt.y() - m_rect.bottom()) <= tol)
+            else if(abs(pt.x() - m_rect.center().x()) <= m_tolerance
+                    && abs(pt.y() - m_rect.bottom()) <= m_tolerance)
             {
                 setCursor(Qt::SizeVerCursor);
-                m_bPt = event->pos();
                 m_oldPt = m_rect.bottomRight();
                 m_oldPt2 = m_rect.bottomLeft();
                 m_curCornerType = BOTTOM;
                 m_bScaling = true;
+                m_scalePt = m_bPt;
             }
             // LeftBottom
-            else if(abs(pt.x() - m_rect.left()) <= tol
-                    && abs(pt.y() - m_rect.bottom()) <= tol)
+            else if(abs(pt.x() - m_rect.left()) <= m_tolerance
+                    && abs(pt.y() - m_rect.bottom()) <= m_tolerance)
             {
                 setCursor(Qt::SizeBDiagCursor);
-                m_bPt = event->pos();
                 m_oldPt = m_rect.bottomLeft();
                 m_curCornerType = LEFTBOTTOM;
                 m_bScaling = true;
+                m_scalePt = m_bPt;
             }
             // Left
-            else if(abs(pt.x() - m_rect.left()) <= tol
-                    && abs(pt.y() - m_rect.center().y()) <= tol)
+            else if(abs(pt.x() - m_rect.left()) <= m_tolerance
+                    && abs(pt.y() - m_rect.center().y()) <= m_tolerance)
             {
                 setCursor(Qt::SizeHorCursor);
-                m_bPt = event->pos();
                 m_oldPt = m_rect.bottomLeft();
                 m_oldPt2 = m_rect.topLeft();
                 m_curCornerType = LEFT;
                 m_bScaling = true;
+                m_scalePt = m_bPt;
             }
 
             // Center
@@ -301,7 +306,6 @@ void ScreenShotForm::mousePressEvent(QMouseEvent *event)
                 m_bDrawRect = true;
                 m_bPt = event->pos();
                 m_ePt = event->pos();
-                showSizeLabel(m_bPt.x(),m_bPt.y());
             }
             return;
         }
@@ -310,7 +314,6 @@ void ScreenShotForm::mousePressEvent(QMouseEvent *event)
             m_bDrawRect = true;
             m_bPt = event->pos();
             m_ePt = event->pos();
-            showSizeLabel(m_bPt.x(),m_bPt.y());
         }
     }
     else if(event->button() == Qt::RightButton)
@@ -330,6 +333,10 @@ void ScreenShotForm::mouseReleaseEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
     {
+        m_scalePt.setX(-1);
+        m_scalePt.setY(-1);
+        ui->screenscaled->setGeometry(m_scaledscreenDefautRect);
+
         if(m_bPopMenu)
         {
             if(m_bScaling)
@@ -343,7 +350,7 @@ void ScreenShotForm::mouseReleaseEvent(QMouseEvent *event)
                 m_bMoving = false;
                 setCursor(m_arrowCursor);
             }
-            return;
+            update();
         }
 
         if(m_bDrawRect)
@@ -356,6 +363,7 @@ void ScreenShotForm::mouseReleaseEvent(QMouseEvent *event)
             showPopMenu(m_ePt.x(),m_ePt.y());
         }
     }
+
 }
 
 void ScreenShotForm::mouseMoveEvent(QMouseEvent *event)
@@ -363,6 +371,7 @@ void ScreenShotForm::mouseMoveEvent(QMouseEvent *event)
     if(m_bScaling)
     {
         m_ePt = event->pos();
+        m_scalePt = m_ePt;
 
         switch(m_curCornerType)
         {
@@ -415,60 +424,60 @@ void ScreenShotForm::mouseMoveEvent(QMouseEvent *event)
     if(m_bScreenShot && m_bDrawRect)
     {
         m_ePt = event->pos();
+        m_scalePt = m_ePt;
         update();
     }
 
     if(m_bScreenShot && m_bPopMenu)
     {
-        int tol = 5;
         QPoint pt = cursor().pos();
         pt = pt - this->geometry().topLeft();
 
         // TopLeft
-        if(abs(pt.x() - m_rect.left()) <= tol
-                && abs(pt.y() - m_rect.top()) <= tol)
+        if(abs(pt.x() - m_rect.left()) <= m_tolerance
+                && abs(pt.y() - m_rect.top()) <= m_tolerance)
         {
             setCursor(Qt::SizeFDiagCursor);
         }
         // Top
-        else if(abs(pt.x() - m_rect.center().x()) <= tol
-                && abs(pt.y() - m_rect.top()) <= tol)
+        else if(abs(pt.x() - m_rect.center().x()) <= m_tolerance
+                && abs(pt.y() - m_rect.top()) <= m_tolerance)
         {
             setCursor(Qt::SizeVerCursor);
         }
         // TopRight
-        else if(abs(pt.x() - m_rect.right()) <= tol
-                && abs(pt.y() - m_rect.top()) <= tol)
+        else if(abs(pt.x() - m_rect.right()) <= m_tolerance
+                && abs(pt.y() - m_rect.top()) <= m_tolerance)
         {
             setCursor(Qt::SizeBDiagCursor);
         }
         // Right
-        else if(abs(pt.x() - m_rect.right()) <= tol
-                && abs(pt.y() - m_rect.center().y()) <= tol)
+        else if(abs(pt.x() - m_rect.right()) <= m_tolerance
+                && abs(pt.y() - m_rect.center().y()) <= m_tolerance)
         {
             setCursor(Qt::SizeHorCursor);
         }
         // RightBottom
-        else if(abs(pt.x() - m_rect.right()) <= tol
-                && abs(pt.y() - m_rect.bottom()) <= tol)
+        else if(abs(pt.x() - m_rect.right()) <= m_tolerance
+                && abs(pt.y() - m_rect.bottom()) <= m_tolerance)
         {
             setCursor(Qt::SizeFDiagCursor);
         }
         // Bottom
-        else if(abs(pt.x() - m_rect.center().x()) <= tol
-                && abs(pt.y() - m_rect.bottom()) <= tol)
+        else if(abs(pt.x() - m_rect.center().x()) <= m_tolerance
+                && abs(pt.y() - m_rect.bottom()) <= m_tolerance)
         {
             setCursor(Qt::SizeVerCursor);
         }
         // LeftBottom
-        else if(abs(pt.x() - m_rect.left()) <= tol
-                && abs(pt.y() - m_rect.bottom()) <= tol)
+        else if(abs(pt.x() - m_rect.left()) <= m_tolerance
+                && abs(pt.y() - m_rect.bottom()) <= m_tolerance)
         {
             setCursor(Qt::SizeBDiagCursor);
         }
         // Left
-        else if(abs(pt.x() - m_rect.left()) <= tol
-                && abs(pt.y() - m_rect.center().y()) <= tol)
+        else if(abs(pt.x() - m_rect.left()) <= m_tolerance
+                && abs(pt.y() - m_rect.center().y()) <= m_tolerance)
         {
             setCursor(Qt::SizeHorCursor);
         }
@@ -524,59 +533,41 @@ void ScreenShotForm::showScaleCorner(QRect rect, QPainter* painter)
     (*painter).drawLine(rect.bottomLeft(),rect.bottomLeft()-QPoint(0,width));
 }
 
-void ScreenShotForm::showScaledPoint()
+void ScreenShotForm::showScaledPoint(QPoint pt)
 {
-    int size = 120;
-    int scale = 3;
-    int space = 35;
-    QPoint pt = cursor().pos();
-    pt = pt - this->geometry().topLeft();
-    QImage image = screenImage.copy(pt.x()-size/(scale*2),pt.y()-size/(scale*2),
-                                    size/scale,size/scale);
-    image = image.scaled(size,size);
+    QImage image = screenImage.copy(pt.x()-m_size/(m_scale*2),pt.y()-m_size/(m_scale*2),
+                                    m_size/m_scale,m_size/m_scale);
+    image = image.scaled(m_size,m_size);
 
     QRect rectImage = screenImage.rect();
 
     QPoint ptLeftTop;
-    ptLeftTop = pt + QPoint(space,space);
+    ptLeftTop = pt + QPoint(m_space,m_space);
 
-    if(ptLeftTop.x() + size > rectImage.right())
+    if(ptLeftTop.x() + m_size > rectImage.right())
     {
-        ptLeftTop.setX(pt.x()-size -space);
-        if(ptLeftTop.y() + size > rectImage.bottom())
+        ptLeftTop.setX(pt.x()-m_size -m_space);
+        if(ptLeftTop.y() + m_size > rectImage.bottom())
         {
-            ptLeftTop.setY(pt.y()-size -space);
+            ptLeftTop.setY(pt.y()-m_size -m_space);
         }
     }
-    else if(ptLeftTop.y() + size > rectImage.bottom())
+    else if(ptLeftTop.y() + m_size > rectImage.bottom())
     {
-        ptLeftTop.setY(pt.y()-size -space);
+        ptLeftTop.setY(pt.y()-m_size -m_space);
     }
-
-//    if(ptLeftTop.x() < rectImage.left())
-//    {
-//        if(ptLeftTop.y() + size > rectImage.bottom()) // LeftBottom
-//        {
-//            ptLeftTop.setX(pt.x()-size -space);
-//            ptLeftTop.setY(pt.y()-size -space);
-//        }
-//        else
-//        {
-//            ptLeftTop.setX(pt.x()-size -space); // Left
-//        }
-//    }
 
     QRect rect;
     rect.setTopLeft(ptLeftTop);
-    rect.setRight(ptLeftTop.x()+size);
-    rect.setBottom(ptLeftTop.y()+size);
+    rect.setRight(ptLeftTop.x()+m_size);
+    rect.setBottom(ptLeftTop.y()+m_size);
 
     QPainter painter(&image);
     painter.setPen(QPen(QColor(0,0,255),2));
-    painter.drawRect(0,0,size,size);
+    painter.drawRect(0,0,m_size,m_size);
     painter.setPen(QPen(QColor(255,0,0),1));
-    painter.drawLine(0,size/2+scale,size,size/2+scale);
-    painter.drawLine(size/2+scale,0,size/2+scale,size);
+    painter.drawLine(0,m_size/2+m_scale,m_size,m_size/2+m_scale);
+    painter.drawLine(m_size/2+m_scale,0,m_size/2+m_scale,m_size);
 
     ui->screenscaled->setPixmap(QPixmap::fromImage(image));
     ui->screenscaled->setGeometry(rect);
@@ -584,17 +575,17 @@ void ScreenShotForm::showScaledPoint()
 
 void ScreenShotForm::showPopMenu(int x,int y)
 {
-    int space = 5;
+    int m_space = 5;
 
     QRect rectImage = screenImage.rect();
-    QPoint pt(x,y+space);
+    QPoint pt(x,y+m_space);
     int width = m_popMenuDefautRect.width();
     int height = m_popMenuDefautRect.height();
 
     if(pt.y() + height > rectImage.bottom())
     {
-        pt.setY(pt.y() - height - 2*space);
-        pt.setX(pt.x() - space);
+        pt.setY(pt.y() - height - 2*m_space);
+        pt.setX(pt.x() - m_space);
     }
 
     QRect rect;
@@ -609,18 +600,18 @@ void ScreenShotForm::showPopMenu(int x,int y)
 
 void ScreenShotForm::showSizeLabel(int x, int y)
 {
-    int space = 5;
+    int m_space = 5;
 
     QRect rectImage = screenImage.rect();
-    QPoint pt(x,y-space);
+    QPoint pt(x,y-m_space);
 
     int width = m_labelDefautRect.width();
     int height = m_labelDefautRect.height();
 
     if(pt.y() - height < rectImage.top())
     {
-        pt.setY(pt.y() + height + 2*space);
-        pt.setX(pt.x() + space);
+        pt.setY(pt.y() + height + 2*m_space);
+        pt.setX(pt.x() + m_space);
     }
 
     QRect rect;
@@ -665,6 +656,9 @@ void ScreenShotForm::resetScreenShot()
     m_bPopMenu = false;
     m_bMoving = false;
     m_bScaling = false;
+
+    m_scalePt.setX(-1);
+    m_scalePt.setY(-1);
 
     ui->horizontalLayoutWidget->setGeometry(m_popMenuDefautRect);
     ui->label_size->setGeometry(m_labelDefautRect);

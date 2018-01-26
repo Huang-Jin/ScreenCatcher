@@ -40,11 +40,17 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
 
     void showScaleCorner(QRect rect,QPainter* painter);
-    void showScaledPoint();
+    void showScaledPoint(QPoint pt);
     void showPopMenu(int x,int y);
     void showSizeLabel(int x, int y);
 
 private:
+
+    static const int m_size = 120;
+    static const int m_scale = 3;
+    static const int m_space = 35;
+    static const int m_tolerance = 3;
+
     Ui::ScreenShotForm *ui;
     QWidget* m_parent;
 
@@ -55,6 +61,7 @@ private:
     bool m_bScaling;
 
     QImage screenImage;
+    QPoint m_scalePt;
     QPoint m_bPt;
     QPoint m_ePt;
     QPoint m_oldPt;

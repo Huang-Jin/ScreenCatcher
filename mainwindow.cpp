@@ -71,13 +71,13 @@ MainWindow::MainWindow(QWidget *parent) :
     m_screenShotForm->setShotting(false);
     m_screenShotForm->setMainWindow(this);
 
-    m_globalShortcut_shotting = new QxtGlobalShortcut(QKeySequence("Ctrl+Alt+Q"),this);
+    m_globalShortcut_shotting = new QxtGlobalShortcut(QKeySequence("Ctrl+A"),this);
     QObject::connect(m_globalShortcut_shotting,SIGNAL(activated()),this,SLOT(ActivateScreenShot()));
 
     m_globalShortcut_close = new QxtGlobalShortcut(QKeySequence("Ctrl+W"),this);
     QObject::connect(m_globalShortcut_close,SIGNAL(activated()),this,SLOT(close()));
 
-    m_globalShortcut_copy = new QxtGlobalShortcut(QKeySequence("Ctrl+C"),this);
+    m_globalShortcut_copy = new QxtGlobalShortcut(QKeySequence("Ctrl+Alt+C"),this);
     QObject::connect(m_globalShortcut_copy,SIGNAL(activated()),this,SLOT(copyRGBData()));
 
     QIcon icon = QIcon(":/images/wblue.ico");

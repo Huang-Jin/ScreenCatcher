@@ -33,13 +33,13 @@
 }
 QPushButton#btn_savefile:hover
 {
-	background-color:rgb(250,100,100);
+	background-color:rgb(100,250,100);
 	color:rgb(250,201,110);
 }
 
 QPushButton#btn_savefile:pressed
 {
-	background-color:rgb(250,100,100);
+	background-color:rgb(100,250,100);
 	color:rgb(250,248,107);
 }</string>
       </property>
@@ -59,15 +59,16 @@ QPushButton#btn_savefile:pressed
 	background-color:rgba(0,0,0,0);
 	color:rgb(250,161,65);
 }
+
 QPushButton#btn_saveclip:hover
 {
-	background-color:rgb(100,250,100);
+	background-color:rgb(250,100,100);
 	color:rgb(250,201,110);
 }
 
 QPushButton#btn_saveclip:pressed
 {
-	background-color:rgb(100,250,100);
+	background-color:rgb(250,100,100);
 	color:rgb(250,248,107);
 }</string>
       </property>

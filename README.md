@@ -1,6 +1,6 @@
 # ScreenCatcher
 
-Version 1.0
+## Version 1.0
 
 ScreenCatcher is a program written by QT Creator, which means it could be compiled both on Windows and Linux.
 The version of QT used is 5.6.2.
@@ -9,8 +9,12 @@ This program could catch informations from the screen, which includes the RGB va
 
 Besides, it could make a screenshot of your screen. By using the shortcut Ctrl+Alt+Q to activates this function. If you have used the screenshot tool provided by QQ, you will find that they are very similar. As there are no powerful programs which could make a screenshot in the Linux system, this program will have a good performance.
 
-Version 1.1
+## Version 1.1
 
 Fixed some bugs and tested the performance in Ubuntu14.
 
 I found that the icon and the function of saving screenshot into file can't work in this Linux System. So I replaced them with OS_Prefered codes.
+
+## Version 1.3
+
+When we have drawn a rectangle to scatch the screen, we can toggle the mouse in the corners of this rectangle to adjust it. Now in this release version, you could see the enlarged areas under the mouse when toggling. The idea comes from QQ.

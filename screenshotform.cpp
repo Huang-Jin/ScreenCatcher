@@ -215,7 +215,6 @@ void ScreenShotForm::mousePressEvent(QMouseEvent *event)
                 m_oldPt = m_rect.topLeft();
                 m_curCornerType = LEFTTOP;
                 m_bScaling = true;
-                m_scalePt = m_bPt;
             }
             // Top
             else if(abs(pt.x() - m_rect.center().x()) <= m_tolerance
@@ -226,7 +225,6 @@ void ScreenShotForm::mousePressEvent(QMouseEvent *event)
                 m_oldPt2 = m_rect.topRight();
                 m_curCornerType = TOP;
                 m_bScaling = true;
-                m_scalePt = m_bPt;
             }
             // TopRight
             else if(abs(pt.x() - m_rect.right()) <= m_tolerance
@@ -236,7 +234,6 @@ void ScreenShotForm::mousePressEvent(QMouseEvent *event)
                 m_oldPt = m_rect.topRight();
                 m_curCornerType = RIGHTTOP;
                 m_bScaling = true;
-                m_scalePt = m_bPt;
             }
             // Right
             else if(abs(pt.x() - m_rect.right()) <= m_tolerance
@@ -247,7 +244,6 @@ void ScreenShotForm::mousePressEvent(QMouseEvent *event)
                 m_oldPt2 = m_rect.bottomRight();
                 m_curCornerType = RIGHT;
                 m_bScaling = true;
-                m_scalePt = m_bPt;
             }
             // RightBottom
             else if(abs(pt.x() - m_rect.right()) <= m_tolerance
@@ -257,7 +253,6 @@ void ScreenShotForm::mousePressEvent(QMouseEvent *event)
                 m_oldPt = m_rect.bottomRight();
                 m_curCornerType = RIGHTBOTTOM;
                 m_bScaling = true;
-                m_scalePt = m_bPt;
             }
             // Bottom
             else if(abs(pt.x() - m_rect.center().x()) <= m_tolerance
@@ -268,7 +263,6 @@ void ScreenShotForm::mousePressEvent(QMouseEvent *event)
                 m_oldPt2 = m_rect.bottomLeft();
                 m_curCornerType = BOTTOM;
                 m_bScaling = true;
-                m_scalePt = m_bPt;
             }
             // LeftBottom
             else if(abs(pt.x() - m_rect.left()) <= m_tolerance
@@ -278,7 +272,6 @@ void ScreenShotForm::mousePressEvent(QMouseEvent *event)
                 m_oldPt = m_rect.bottomLeft();
                 m_curCornerType = LEFTBOTTOM;
                 m_bScaling = true;
-                m_scalePt = m_bPt;
             }
             // Left
             else if(abs(pt.x() - m_rect.left()) <= m_tolerance
@@ -289,7 +282,6 @@ void ScreenShotForm::mousePressEvent(QMouseEvent *event)
                 m_oldPt2 = m_rect.topLeft();
                 m_curCornerType = LEFT;
                 m_bScaling = true;
-                m_scalePt = m_bPt;
             }
 
             // Center
@@ -370,38 +362,52 @@ void ScreenShotForm::mouseMoveEvent(QMouseEvent *event)
 {
     if(m_bScaling)
     {
+        QPoint pt1;
+        pt1 = m_oldPt+m_ePt-m_bPt;
         m_ePt = event->pos();
-        m_scalePt = m_ePt;
+        int temp;
 
         switch(m_curCornerType)
         {
         case LEFTTOP:
-            m_rect.setTopLeft(m_oldPt+m_ePt-m_bPt);
+            m_rect.setTopLeft(pt1);
+            m_scalePt = pt1;
             break;
         case TOP:
-            m_rect.setTopLeft(QPoint(m_oldPt.x(),m_oldPt.y()+m_ePt.y()-m_bPt.y()));
-            m_rect.setTopRight(QPoint(m_oldPt2.x(),m_oldPt2.y()+m_ePt.y()-m_bPt.y()));
+            temp = m_oldPt.y()+m_ePt.y()-m_bPt.y();
+            m_rect.setTopLeft(QPoint(m_oldPt.x(),temp));
+            m_rect.setTopRight(QPoint(m_oldPt2.x(),temp));
+            m_scalePt = QPoint(m_ePt.x(),temp);
             break;
         case RIGHTTOP:
-            m_rect.setTopRight(m_oldPt+m_ePt-m_bPt);
+            m_rect.setTopRight(pt1);
+            m_scalePt = pt1;
             break;
         case RIGHT:
-            m_rect.setTopRight(QPoint(m_oldPt.x()+m_ePt.x()-m_bPt.x(),m_oldPt.y()));
-            m_rect.setBottomRight(QPoint(m_oldPt2.x()+m_ePt.x()-m_bPt.x(),m_oldPt2.y()));
+            temp = m_oldPt.x()+m_ePt.x()-m_bPt.x();
+            m_rect.setTopRight(QPoint(temp,m_oldPt.y()));
+            m_rect.setBottomRight(QPoint(temp,m_oldPt2.y()));
+            m_scalePt = QPoint(temp,m_ePt.y());
             break;
         case RIGHTBOTTOM:
-            m_rect.setBottomRight(m_oldPt+m_ePt-m_bPt);
+            m_rect.setBottomRight(pt1);
+            m_scalePt = pt1;
             break;
         case BOTTOM:
-            m_rect.setBottomRight(QPoint(m_oldPt.x(),m_oldPt.y()+m_ePt.y()-m_bPt.y()));
-            m_rect.setBottomLeft(QPoint(m_oldPt2.x(),m_oldPt2.y()+m_ePt.y()-m_bPt.y()));
+            temp = m_oldPt.y()+m_ePt.y()-m_bPt.y();
+            m_rect.setBottomRight(QPoint(m_oldPt.x(),temp));
+            m_rect.setBottomLeft(QPoint(m_oldPt2.x(),temp));
+            m_scalePt = QPoint(m_ePt.x(),temp);
             break;
         case LEFTBOTTOM:
-            m_rect.setBottomLeft(m_oldPt+m_ePt-m_bPt);
+            m_rect.setBottomLeft(pt1);
+            m_scalePt = pt1;
             break;
         case LEFT:
-            m_rect.setBottomLeft(QPoint(m_oldPt.x()+m_ePt.x()-m_bPt.x(),m_oldPt.y()));
-            m_rect.setTopLeft(QPoint(m_oldPt2.x()+m_ePt.x()-m_bPt.x(),m_oldPt2.y()));
+            temp = m_oldPt.x()+m_ePt.x()-m_bPt.x();
+            m_rect.setBottomLeft(QPoint(temp,m_oldPt.y()));
+            m_rect.setTopLeft(QPoint(temp,m_oldPt2.y()));
+            m_scalePt = QPoint(temp,m_ePt.y());
             break;
         }
         update();
@@ -428,7 +434,7 @@ void ScreenShotForm::mouseMoveEvent(QMouseEvent *event)
         update();
     }
 
-    if(m_bScreenShot && m_bPopMenu)
+    if(m_bScreenShot && m_bPopMenu && !m_bMoving && !m_bScaling)
     {
         QPoint pt = cursor().pos();
         pt = pt - this->geometry().topLeft();

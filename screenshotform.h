@@ -49,7 +49,7 @@ private:
     static const int m_size = 120;
     static const int m_scale = 3;
     static const int m_space = 35;
-    static const int m_tolerance = 3;
+    static const int m_tolerance = 5;
 
     Ui::ScreenShotForm *ui;
     QWidget* m_parent;

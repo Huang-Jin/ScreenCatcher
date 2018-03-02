@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //    rect.setLeft(30);
 //    ui->label_titleName->setGeometry(rect);
 
-    ui->statusBar->showMessage("Nothing now...");
+    ui->statusBar->showMessage("Ready, press \"P\" to start rgb catching...");
 
     ui->centralWidget->setMouseTracking(true);
     this->setMouseTracking(true);
@@ -61,8 +61,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(moveTimer,SIGNAL(timeout()),SLOT(MouseMove()));
     moveTimer->start(50);
 
-    bRgbCatching = true;
-    m_globalShortcut_rgb = new QxtGlobalShortcut(QKeySequence("Ctrl+P"),this);
+    bRgbCatching = false; // Do not catching rgb in default
+    m_globalShortcut_rgb = new QxtGlobalShortcut(QKeySequence("P"),this);
     QObject::connect(m_globalShortcut_rgb,SIGNAL(activated()),this,SLOT(ActivateRGBCatcher()));
 
     m_rgbGraphRect = ui->rgbGraph->geometry();
@@ -165,7 +165,7 @@ void MainWindow::DrawTemplateText()
         QString name;
         name =  QString("%1").arg(rgb,4,16,QLatin1Char('0'));
         ui->label_test->setText("#" + name.mid(2));
-        ui->statusBar->showMessage("Color is Changing, Ctrl+P to pause...");
+        ui->statusBar->showMessage("Color is changing, press \"P\" to pause...");
     }
 
 //    qDebug() << color.colorNames().at(0);
@@ -214,9 +214,9 @@ void MainWindow::ActivateRGBCatcher()
 {
     bRgbCatching = !bRgbCatching;
     if(!bRgbCatching)
-        ui->statusBar->showMessage("Paused, Ctrl+P to continue...");
+        ui->statusBar->showMessage("Paused, press \"P\" to continue...");
     else
-        ui->statusBar->showMessage("Continued, Ctrl+P to pause...");
+        ui->statusBar->showMessage("Color is changing, press \"P\" to pause...");
 }
 
 void MainWindow::ActivateScreenShot()

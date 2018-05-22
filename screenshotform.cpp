@@ -51,6 +51,7 @@ ScreenShotForm::ScreenShotForm(QWidget *parent) :
     ui->horizontalLayoutWidget->setStyleSheet("background-color:#969696;");
 
     connect(ui->btn_closeRect,SIGNAL(clicked(bool)),this,SLOT(hide()));
+    connect(ui->btn_saveRect,SIGNAL(clicked(bool)),this,SLOT(savePresetRect()));
     connect(ui->btn_saveclip,SIGNAL(clicked(bool)),this,SLOT(saveIntoclip()));
     connect(ui->btn_savefile,SIGNAL(clicked(bool)),this,SLOT(saveIntofile()));
 
@@ -59,6 +60,7 @@ ScreenShotForm::ScreenShotForm(QWidget *parent) :
     m_bPopMenu = false;
     m_bMoving = false;
     m_bScaling = false;
+    m_bPresetRect = false;
 
     m_scalePt.setX(-1);
     m_scalePt.setY(-1);
@@ -78,7 +80,7 @@ void ScreenShotForm::paintEvent(QPaintEvent *event)
     }
 
     QPainter painter(this);
-    painter.drawImage(0,0,screenImage);
+    painter.drawImage(0,0,m_screenImage);
 
     if(m_bDrawRect)
     {
@@ -116,7 +118,7 @@ void ScreenShotForm::paintEvent(QPaintEvent *event)
         painter.setBrush(QBrush(QColor(128,128,128,128)));
         painter.setPen(Qt::NoPen);
 
-        QRect rectImage = screenImage.rect();
+        QRect rectImage = m_screenImage.rect();
 
         QRect r1(QPoint(rectImage.left(),rectImage.top()),QPoint(rectImage.right(),m_rect.top()));
         QRect r2(QPoint(rectImage.left(),m_rect.top()+1),QPoint(m_rect.left(),m_rect.bottom()));
@@ -140,7 +142,7 @@ void ScreenShotForm::paintEvent(QPaintEvent *event)
         painter.setBrush(QBrush(QColor(128,128,128,128)));
         painter.setPen(Qt::NoPen);
 
-        QRect rect = screenImage.rect();
+        QRect rect = m_screenImage.rect();
 
         QRect r1(QPoint(rect.left(),rect.top()),QPoint(rect.right(),m_rect.top()));
         QRect r2(QPoint(rect.left(),m_rect.top()+1),QPoint(m_rect.left(),m_rect.bottom()));
@@ -419,7 +421,7 @@ void ScreenShotForm::mouseMoveEvent(QMouseEvent *event)
         QRect oldrect = m_rect;
         m_rect.moveCenter(m_oldPt+m_ePt-m_bPt);
 
-        if(!screenImage.rect().contains(m_rect))
+        if(!m_screenImage.rect().contains(m_rect))
         {
             m_rect = oldrect;
         }
@@ -434,6 +436,7 @@ void ScreenShotForm::mouseMoveEvent(QMouseEvent *event)
         update();
     }
 
+    // change style of cursor
     if(m_bScreenShot && m_bPopMenu && !m_bMoving && !m_bScaling)
     {
         QPoint pt = cursor().pos();
@@ -541,11 +544,11 @@ void ScreenShotForm::showScaleCorner(QRect rect, QPainter* painter)
 
 void ScreenShotForm::showScaledPoint(QPoint pt)
 {
-    QImage image = screenImage.copy(pt.x()-m_size/(m_scale*2),pt.y()-m_size/(m_scale*2),
+    QImage image = m_screenImage.copy(pt.x()-m_size/(m_scale*2),pt.y()-m_size/(m_scale*2),
                                     m_size/m_scale,m_size/m_scale);
     image = image.scaled(m_size,m_size);
 
-    QRect rectImage = screenImage.rect();
+    QRect rectImage = m_screenImage.rect();
 
     QPoint ptLeftTop;
     ptLeftTop = pt + QPoint(m_space,m_space);
@@ -583,7 +586,7 @@ void ScreenShotForm::showPopMenu(int x,int y)
 {
     int m_space = 5;
 
-    QRect rectImage = screenImage.rect();
+    QRect rectImage = m_screenImage.rect();
     QPoint pt(x,y+m_space);
     int width = m_popMenuDefautRect.width();
     int height = m_popMenuDefautRect.height();
@@ -608,7 +611,7 @@ void ScreenShotForm::showSizeLabel(int x, int y)
 {
     int m_space = 5;
 
-    QRect rectImage = screenImage.rect();
+    QRect rectImage = m_screenImage.rect();
     QPoint pt(x,y-m_space);
 
     int width = m_labelDefautRect.width();
@@ -633,7 +636,7 @@ void ScreenShotForm::showSizeLabel(int x, int y)
 
 void ScreenShotForm::saveIntofile()
 {
-    QImage image = screenImage.copy(m_rect);
+    QImage image = m_screenImage.copy(m_rect);
     QString fileName = QString("screenshot.png");
 #ifdef Q_OS_WIN
     fileName = QFileDialog::getSaveFileName(this, tr("Save file"), "./screenshot.png",  tr("Allfiles(*.*);;Png(*.png);;"));
@@ -651,8 +654,9 @@ void ScreenShotForm::saveIntofile()
 void ScreenShotForm::saveIntoclip()
 {
     QClipboard *board = QApplication::clipboard();
-    QImage image = screenImage.copy(m_rect);
+    QImage image = m_screenImage.copy(m_rect);
     board->setImage(image);
+    board = NULL;
     hide();
 }
 
@@ -662,6 +666,7 @@ void ScreenShotForm::resetScreenShot()
     m_bPopMenu = false;
     m_bMoving = false;
     m_bScaling = false;
+    m_bPresetRect = false;
 
     m_scalePt.setX(-1);
     m_scalePt.setY(-1);
@@ -674,9 +679,27 @@ void ScreenShotForm::resetScreenShot()
     update();
 }
 
+void ScreenShotForm::savePresetRect()
+{
+    if(!m_bPopMenu)
+        return;
+
+    m_bPresetRect = true;
+    m_presetRect = m_rect;
+
+    QMessageBox::information(this,"提示","截图区域已保存！",QMessageBox::Ok);
+}
+
 void ScreenShotForm::beginShotting()
 {
     m_bScreenShot = true;
     QScreen *screen = QGuiApplication::primaryScreen();
-    screenImage = screen->grabWindow(QApplication::desktop()->winId()).toImage();
+    m_screenImage = screen->grabWindow(QApplication::desktop()->winId()).toImage();
+
+    if(m_bPresetRect)
+    {
+        m_rect = m_presetRect;
+        m_bPopMenu = true;
+        update();
+    }
 }

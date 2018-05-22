@@ -16,13 +16,43 @@
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>70</y>
-     <width>239</width>
+     <x>40</x>
+     <y>90</y>
+     <width>351</width>
      <height>32</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="screenshotMenu">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QPushButton" name="btn_saveRect">
+      <property name="styleSheet">
+       <string notr="true">QPushButton#btn_saveRect
+{
+	background-color:rgba(0,0,0,0);
+	color:rgb(250,161,65);
+}
+QPushButton#btn_saveRect:hover
+{
+	background-color:rgb(100,100,250);
+	color:rgb(250,201,110);
+}
+QPushButton#btn_saveRect:pressed
+{
+	background-color:rgb(100,100,250);
+	color:rgb(250,248,107);
+}</string>
+      </property>
+      <property name="text">
+       <string>保存截图区域</string>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
     <item>
      <widget class="QPushButton" name="btn_savefile">
       <property name="styleSheet">

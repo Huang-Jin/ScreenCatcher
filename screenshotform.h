@@ -30,6 +30,7 @@ protected slots:
     void saveIntofile();
     void saveIntoclip();
     void resetScreenShot();
+    void savePresetRect();
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -59,14 +60,17 @@ private:
     bool m_bPopMenu;
     bool m_bMoving;
     bool m_bScaling;
+    bool m_bPresetRect;
 
-    QImage screenImage;
+    QImage m_screenImage;
     QPoint m_scalePt;
     QPoint m_bPt;
     QPoint m_ePt;
     QPoint m_oldPt;
     QPoint m_oldPt2;
     QRect m_rect;
+
+    QRect m_presetRect;
 
     CornerType m_curCornerType;
 
@@ -77,7 +81,7 @@ private:
     QCursor m_arrowCursor;
 public:
     bool IsShotting() {return m_bScreenShot;}
-    void setShotting(bool b) {m_bScreenShot = b;}
+//    void setShotting(bool b) {m_bScreenShot = b;}
     void setMainWindow(QWidget* parent) {m_parent = parent;}
 
     void beginShotting();

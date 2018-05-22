@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //    rect.setLeft(30);
 //    ui->label_titleName->setGeometry(rect);
 
-    ui->statusBar->showMessage("Ready, press \"P\" to start rgb catching...");
+    ui->statusBar->showMessage("Ready, press CTRL+\"P\" to start rgb catching...");
 
     ui->centralWidget->setMouseTracking(true);
     this->setMouseTracking(true);
@@ -62,16 +62,15 @@ MainWindow::MainWindow(QWidget *parent) :
     moveTimer->start(50);
 
     bRgbCatching = false; // Do not catching rgb in default
-    m_globalShortcut_rgb = new QxtGlobalShortcut(QKeySequence("P"),this);
+    m_globalShortcut_rgb = new QxtGlobalShortcut(QKeySequence("Ctrl+P"),this);
     QObject::connect(m_globalShortcut_rgb,SIGNAL(activated()),this,SLOT(ActivateRGBCatcher()));
 
     m_rgbGraphRect = ui->rgbGraph->geometry();
 
     m_screenShotForm = new ScreenShotForm(0);
-    m_screenShotForm->setShotting(false);
     m_screenShotForm->setMainWindow(this);
 
-    m_globalShortcut_shotting = new QxtGlobalShortcut(QKeySequence("Ctrl+A"),this);
+    m_globalShortcut_shotting = new QxtGlobalShortcut(QKeySequence("Ctrl+Alt+Q"),this);
     QObject::connect(m_globalShortcut_shotting,SIGNAL(activated()),this,SLOT(ActivateScreenShot()));
 
     m_globalShortcut_close = new QxtGlobalShortcut(QKeySequence("Ctrl+W"),this);
@@ -222,8 +221,7 @@ void MainWindow::ActivateRGBCatcher()
 void MainWindow::ActivateScreenShot()
 {
     this->hide();
-    update();
-    m_screenShotForm->setShotting(true);
+//    update();
     m_screenShotForm->beginShotting();
     m_screenShotForm->show();
 }
